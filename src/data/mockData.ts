@@ -96,15 +96,16 @@ export const mockActor: Actor = {
       id: "film-000",
       title: "Parasakthi",
       year: 2026,
-      genre: ["Drama", "Political fiction"],
+      genre: ["Historical", "Drama", "Political fiction"],
       role: "Lead",
       character: "Chezhiyan",
-      poster: "/amaran.png",
-      posterLandscape: "https://images.ottplay.com/images/parasakthi-poster-1738206213.jpg?impolicy=ottplay-202501_high&width=1200&height=675",
+      poster: "/sample.png",
+      posterLandscape:
+        "https://images.ottplay.com/images/parasakthi-poster-1738206213.jpg?impolicy=ottplay-202501_high&width=1200&height=675",
       posterSquare:
         "https://static.moviecrow.com/gallery/20251118/252122-Parasakthi%20Sivakarthikeyan%20Sudha%20Kongara%20GV%20Prakash%20Kumar%20Pongal%202026%20Release%20Date.jpg",
       rating: 0.0,
-      runtime: 10,
+      runtime: 161,
       director: "Sudha Kongara Prasad",
       synopsis:
         "Parasakthi is an upcoming Indian Tamil-language political historical drama film directed by Sudha Kongara and produced by Aakash Bhaskaran of Dawn Pictures.",
@@ -473,7 +474,8 @@ export const mockActor: Actor = {
       character: " Bosepandi M.A, M.Phil.,",
       poster:
         "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=600&fit=crop",
-      posterLandscape: "https://m.media-amazon.com/images/S/pv-target-images/6d2f608c26ee0c0e5acd3f21da48f9fa467845d4c475bb1b802a4aedb6b9c115._UR1920,1080_SX720_FMjpg_.jpg",
+      posterLandscape:
+        "https://m.media-amazon.com/images/S/pv-target-images/6d2f608c26ee0c0e5acd3f21da48f9fa467845d4c475bb1b802a4aedb6b9c115._UR1920,1080_SX720_FMjpg_.jpg",
       posterSquare:
         "https://play-lh.googleusercontent.com/Mgo46lB1FCBBP_XJd-Kr2dh_mTAWqjmu1DnQ93_YPFc6BHf7Zgl2Zpb0MnYG1c9Mh4iL",
       rating: 7.0,
@@ -491,7 +493,8 @@ export const mockActor: Actor = {
       character: "Kunjithapadham alias Harish",
       poster:
         "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=600&fit=crop",
-      posterLandscape: "https://img.airtel.tv/unsafe/fit-in/1600x0/filters:format(webp)/https://xstreamcp-assets-msp.streamready.in/assets/HOTSTAR_DTH/MOVIE/690dea527485246374048b63/images/LANDSCAPE_169/1000036210-h?o=production",
+      posterLandscape:
+        "https://img.airtel.tv/unsafe/fit-in/1600x0/filters:format(webp)/https://xstreamcp-assets-msp.streamready.in/assets/HOTSTAR_DTH/MOVIE/690dea527485246374048b63/images/LANDSCAPE_169/1000036210-h?o=production",
       posterSquare:
         "https://m.media-amazon.com/images/M/MV5BNmNiMzQzM2UtMzRiNC00OTZlLWFjNGMtNDI0YThkZTZjYmE2XkEyXkFqcGc@._V1_.jpg",
       rating: 6.9,
@@ -509,7 +512,8 @@ export const mockActor: Actor = {
       character: "Kannan Ramaiah",
       poster:
         "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=600&fit=crop",
-      posterLandscape: "https://sund-images.sunnxt.com/7022/1920x1080_ManamKothiParavai_7022_8a03ee56-5787-4aa8-9b49-65ffe9bf8e9d.jpg",
+      posterLandscape:
+        "https://sund-images.sunnxt.com/7022/1920x1080_ManamKothiParavai_7022_8a03ee56-5787-4aa8-9b49-65ffe9bf8e9d.jpg",
       posterSquare:
         "https://upload.wikimedia.org/wikipedia/en/6/66/Manam_kothi_paravai.jpg",
       rating: 5.6,
@@ -527,7 +531,8 @@ export const mockActor: Actor = {
       character: "Kumaran",
       poster:
         "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=600&fit=crop",
-      posterLandscape: "https://wallpapers.com/images/hd/3-moonu-movie-ram-janani-intimate-poster-57o8ri5fbzl5a123.jpg",
+      posterLandscape:
+        "https://wallpapers.com/images/hd/3-moonu-movie-ram-janani-intimate-poster-57o8ri5fbzl5a123.jpg",
       posterSquare:
         "https://upload.wikimedia.org/wikipedia/en/d/d6/3_%282012_Tamil_film_soundtrack%29.jpg",
       rating: 7.4,
@@ -545,7 +550,8 @@ export const mockActor: Actor = {
       character: "Senthilnaathan (Senthil)",
       poster:
         "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=600&fit=crop",
-      posterLandscape: "https://m.media-amazon.com/images/S/pv-target-images/c364e334227fc82b44f48d60605330aa05bd3b1d09e7fea4f24c6faccfa71a2a.jpg",
+      posterLandscape:
+        "https://m.media-amazon.com/images/S/pv-target-images/c364e334227fc82b44f48d60605330aa05bd3b1d09e7fea4f24c6faccfa71a2a.jpg",
       posterSquare:
         "https://m.media-amazon.com/images/M/MV5BNDk0ZmFjNjctODI2MS00NTJjLTlkYmMtMjQ4M2FiODI4ZDU2XkEyXkFqcGc@._V1_.jpg",
       rating: 5.7,
@@ -566,7 +572,10 @@ export const mockActor: Actor = {
       url: "https://x.com/Siva_Kartikeyan",
       handle: "@Siva_Kartikeyan",
     },
-    { platform: "imdb", url: "https://www.imdb.com/name/nm4792434/?ref_=nv_sr_srsg_7_tt_0_nm_8_in_0_q_siva" },
+    {
+      platform: "imdb",
+      url: "https://www.imdb.com/name/nm4792434/?ref_=nv_sr_srsg_7_tt_0_nm_8_in_0_q_siva",
+    },
   ],
   similarActors: [
     {
@@ -590,8 +599,7 @@ export const mockActor: Actor = {
     {
       id: "similar-003",
       name: "Vijay",
-      photo:
-        "https://m.media-amazon.com/images/I/71Zg6RRQzsL.jpg",
+      photo: "https://m.media-amazon.com/images/I/71Zg6RRQzsL.jpg",
       knownFor: "Thalapathy",
       bio: "Joseph Vijay Chandrasekhar, known professionally as Vijay, is an Indian film actor and politician.",
       stats: { totalFilms: 69, awardsWon: 30 },
