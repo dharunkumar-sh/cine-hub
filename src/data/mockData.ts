@@ -104,7 +104,7 @@ export const mockActor: Actor = {
         "https://images.ottplay.com/images/parasakthi-poster-1738206213.jpg?impolicy=ottplay-202501_high&width=1200&height=675",
       posterSquare:
         "https://static.moviecrow.com/gallery/20251118/252122-Parasakthi%20Sivakarthikeyan%20Sudha%20Kongara%20GV%20Prakash%20Kumar%20Pongal%202026%20Release%20Date.jpg",
-      rating: 0.0,
+      rating: 6.5,
       runtime: 161,
       director: "Sudha Kongara Prasad",
       synopsis:
