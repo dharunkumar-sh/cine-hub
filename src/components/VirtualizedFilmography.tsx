@@ -265,6 +265,7 @@ export function VirtualizedFilmography({
                     alt={`${film.title} poster`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
+                    decoding="async"
                   />
                 </div>
 
@@ -329,6 +330,7 @@ export function VirtualizedFilmography({
                   alt={`${film.title} poster`}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="lazy"
+                  decoding="async"
                 />
                 <LikeButton
                   movieId={film.id}

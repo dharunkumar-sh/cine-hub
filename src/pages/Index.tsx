@@ -1,4 +1,4 @@
-import { useState, useCallback, Suspense, useEffect } from "react";
+import { useState, useCallback, Suspense, useEffect, lazy } from "react";
 import { motion } from "framer-motion";
 import { mockActor } from "@/data/mockData";
 import { useWatchlist } from "@/hooks/useWatchlist";
@@ -6,10 +6,7 @@ import { useServiceWorker } from "@/hooks/useServiceWorker";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ErrorBoundary, FilmGridSkeleton } from "@/components/ErrorBoundary";
 import { VirtualizedFilmography } from "@/components/VirtualizedFilmography";
-import { MovieDetailsModal } from "@/components/MovieDetailsModal";
-import { SimilarActorsPanel } from "@/components/SimilarActorsPanel";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
-import { AuthModal } from "@/components/AuthModal";
 import { auth } from "@/lib/firebase";
 import {
   onAuthStateChanged,
@@ -30,7 +27,24 @@ import {
   ExternalLink,
   LogOut,
   User as UserIcon,
+  Bookmark,
 } from "lucide-react";
+
+const MovieDetailsModal = lazy(() =>
+  import("@/components/MovieDetailsModal").then((mod) => ({
+    default: mod.MovieDetailsModal,
+  }))
+);
+const SimilarActorsPanel = lazy(() =>
+  import("@/components/SimilarActorsPanel").then((mod) => ({
+    default: mod.SimilarActorsPanel,
+  }))
+);
+const AuthModal = lazy(() =>
+  import("@/components/AuthModal").then((mod) => ({
+    default: mod.AuthModal,
+  }))
+);
 
 const PersonJsonLd = () => (
   <script
@@ -105,6 +119,8 @@ function ActorProfile() {
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover opacity-50"
+          decoding="async"
+          loading="eager"
         />
         <div className="absolute inset-0 hero-overlay" />
 
@@ -113,6 +129,13 @@ function ActorProfile() {
             Sivakarthikeyan Doss
           </span>
           <div className="flex items-center gap-4">
+            <Link
+              to="/watchlist"
+              className="text-sm font-medium text-foreground/80 hover:text-gold transition-colors flex items-center gap-1.5"
+            >
+              <Bookmark className="h-4 w-4 text-gold" />
+              Watchlist
+            </Link>
             {user ? (
               <div className="flex items-center gap-3">
                 <SyncStatusIndicator
@@ -158,6 +181,8 @@ function ActorProfile() {
                 src={mockActor.photo}
                 alt={mockActor.name}
                 className="w-full h-full object-cover"
+                decoding="async"
+                loading="eager"
               />
             </motion.div>
 
@@ -216,7 +241,9 @@ function ActorProfile() {
         </ErrorBoundary>
 
         <div className="mt-16">
-          <SimilarActorsPanel actors={mockActor.similarActors} />
+          <Suspense fallback={<div className="h-32 animate-pulse bg-muted/20 rounded-lg" />}>
+            <SimilarActorsPanel actors={mockActor.similarActors} />
+          </Suspense>
         </div>
       </main>
 
@@ -249,20 +276,28 @@ function ActorProfile() {
         </div>
       </footer>
 
-      <MovieDetailsModal
-        movie={selectedMovie}
-        isOpen={!!selectedMovie}
-        onClose={() => setSelectedMovie(null)}
-        onNavigate={handleNavigate}
-        hasPrev={currentIndex > 0}
-        hasNext={currentIndex < mockActor.filmography.length - 1}
-        onRequireAuth={() => setIsAuthModalOpen(true)}
-      />
+      <Suspense fallback={null}>
+        {selectedMovie && (
+          <MovieDetailsModal
+            movie={selectedMovie}
+            isOpen={!!selectedMovie}
+            onClose={() => setSelectedMovie(null)}
+            onNavigate={handleNavigate}
+            hasPrev={currentIndex > 0}
+            hasNext={currentIndex < mockActor.filmography.length - 1}
+            onRequireAuth={() => setIsAuthModalOpen(true)}
+          />
+        )}
+      </Suspense>
 
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-      />
+      <Suspense fallback={null}>
+        {isAuthModalOpen && (
+          <AuthModal
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

@@ -94,6 +94,24 @@ export const mockActor: Actor = {
   filmography: [
     {
       id: "film-000",
+      title: "Seyon",
+      year: 2026,
+      genre: ["Historical", "Drama", "Political fiction"],
+      role: "Lead",
+      character: "Lead Actor",
+      poster: "/sample.png",
+      posterLandscape:
+        "https://assets-in.bmscdn.com/discovery-catalog/events/et00487903-tkurapfmzb-landscape.jpg",
+      posterSquare:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYiEjiBJmQncJ-aYQqOPL9qF-1GJHML1shRz6uVBnZy-KiUV-FUoJiVG9R&s=10",
+      rating: 0,
+      runtime: 0,
+      director: "Sivakumar Murugesan",
+      synopsis:
+        "Parasakthi is an upcoming Indian Tamil-language political historical drama film directed by Sudha Kongara and produced by Aakash Bhaskaran of Dawn Pictures.",
+    },
+    {
+      id: "film-001",
       title: "Parasakthi",
       year: 2026,
       genre: ["Historical", "Drama", "Political fiction"],
@@ -381,7 +399,7 @@ export const mockActor: Actor = {
       poster:
         "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=600&fit=crop",
       posterLandscape:
-        "https://www.cinejosh.com/gallereys/movies/normal/remo_movie_posters_2110160222/remo_movie_posters_2110160222_05.jpg",
+        "https://www.cinemapluz.com/wp-content/uploads/2016/10/Remo-movie-poster-1.jpg",
       posterSquare:
         "https://m.media-amazon.com/images/S/pv-target-images/9fffccd050d59f6d72e70740a0b3a8fc3ca835bb81a3d7b0a92d62ccf491ccf9.jpg",
       rating: 6.1,
