@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useWatchlist } from "@/hooks/useWatchlist";
-import { auth } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Bookmark, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,27 +21,24 @@ export function WatchlistButton({
   onRequireAuth,
 }: WatchlistButtonProps) {
   const { isInWatchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
+  const { isLoggedIn } = useAuth();
   const inList = isInWatchlist(movieId);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!auth.currentUser);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
-    });
-    return unsubscribe;
-  }, []);
 
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
+
+    if (!isLoggedIn) {
+      onRequireAuth();
+      return;
+    }
 
     setIsAnimating(true);
 
     try {
       if (inList) {
         const ok = await removeFromWatchlist(movieId);
-        console.log("Remove result:", ok);
         if (ok) {
           toast({
             title: "Removed from watchlist",
@@ -51,7 +47,6 @@ export function WatchlistButton({
         }
       } else {
         const ok = await addToWatchlist({ movieId, title, poster });
-        console.log("Add result:", ok);
         if (ok) {
           toast({
             title: "Added to watchlist",
@@ -73,18 +68,19 @@ export function WatchlistButton({
 
   return (
     <motion.button
-      className={`absolute top-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium text-sm transition-all z-10 ${inList
+      className={`absolute top-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium text-sm transition-all z-10 ${
+        inList
           ? "bg-gold text-primary-foreground shadow-md opacity-100"
           : "bg-background/95 text-foreground border border-border hover:bg-gold hover:text-primary-foreground hover:border-gold shadow-sm opacity-0 group-hover:opacity-100"
-        } ${className}`}
+      } ${className}`}
       onClick={handleClick}
       whileTap={{ scale: 0.9 }}
       whileHover={{ scale: 1.05 }}
       animate={
         isAnimating
           ? {
-            scale: [1, 1.1, 1],
-          }
+              scale: [1, 1.1, 1],
+            }
           : {}
       }
       transition={{

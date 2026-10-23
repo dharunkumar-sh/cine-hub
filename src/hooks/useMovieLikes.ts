@@ -1,65 +1,49 @@
 import { useState, useEffect, useCallback } from "react";
-import { toggleMovieLike, getMovieLikes, checkIfLiked } from "@/lib/firebaseDb";
-import { auth } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { getMovieLikes } from "@/lib/firebaseDb";
+import { useAuth } from "@/contexts/AuthContext";
 
-export function useMovieLikes(movieId: string) {
+export function useMovieLikes(
+  movieId: string,
+  options?: { fetchCount?: boolean }
+) {
+  const { user, isLoggedIn, isMovieLiked, toggleLike: authToggleLike } = useAuth();
   const [likesCount, setLikesCount] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const shouldFetchCount = options?.fetchCount ?? true;
+  const isLiked = isMovieLiked(movieId);
 
   useEffect(() => {
-    if (!movieId) {
-      setIsLoading(false);
+    if (!movieId || !shouldFetchCount) {
       return;
     }
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid);
-        setUserEmail(user.email);
-        checkIfLiked(user.uid, movieId).then(setIsLiked);
-      } else {
-        setUserId(null);
-        setUserEmail(null);
-        setIsLiked(false);
-      }
-    });
-
+    setIsLoading(true);
     const unsubscribeLikes = getMovieLikes(movieId, (count) => {
       setLikesCount(count);
       setIsLoading(false);
     });
 
     return () => {
-      unsubscribeAuth();
       unsubscribeLikes();
     };
-  }, [movieId]);
+  }, [movieId, shouldFetchCount]);
 
-  const toggleLike = useCallback(async () => {
-    if (!userId || !movieId) {
-      console.warn("Cannot toggle like: missing userId or movieId");
-      return;
-    }
+  const toggleLike = useCallback(
+    async (movieTitle = "Movie") => {
+      if (!isLoggedIn || !movieId) {
+        return;
+      }
+      return await authToggleLike(movieId, movieTitle);
+    },
+    [isLoggedIn, movieId, authToggleLike]
+  );
 
-    console.log("toggleLike called:", { userId, userEmail, movieId });
-
-    try {
-      const liked = await toggleMovieLike(
-        userId,
-        userEmail || "anonymous",
-        movieId
-      );
-      console.log("Like toggled, new state:", liked);
-      setIsLiked(liked);
-    } catch (error) {
-      console.error("Error toggling like:", error);
-      throw error;
-    }
-  }, [userId, userEmail, movieId]);
-
-  return { likesCount, isLiked, toggleLike, isLoggedIn: !!userId, isLoading };
+  return {
+    likesCount,
+    isLiked,
+    toggleLike,
+    isLoggedIn,
+    isLoading,
+  };
 }

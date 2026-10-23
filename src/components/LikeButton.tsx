@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useMovieLikes } from "@/hooks/useMovieLikes";
 import { Heart } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 interface LikeButtonProps {
   movieId: string;
@@ -17,9 +16,10 @@ export function LikeButton({
   className = "",
   onRequireAuth,
 }: LikeButtonProps) {
-  const { toast } = useToast();
-  const { isLiked, toggleLike, isLoggedIn, isLoading, likesCount } =
-    useMovieLikes(movieId);
+  const { isLiked, toggleLike, isLoggedIn, isLoading } = useMovieLikes(
+    movieId,
+    { fetchCount: false }
+  );
   const [isAnimating, setIsAnimating] = useState(false);
 
   const handleClick = async (e: React.MouseEvent) => {
@@ -33,16 +33,8 @@ export function LikeButton({
     if (isLoading) return;
 
     setIsAnimating(true);
-    const wasLiked = isLiked;
-
     try {
-      await toggleLike();
-      toast({
-        title: wasLiked ? "Unliked" : "Liked",
-        description: wasLiked
-          ? `Removed ${movieTitle} from your likes`
-          : `Added ${movieTitle} to your likes`,
-      });
+      await toggleLike(movieTitle);
     } catch (error) {
       console.error("Error toggling like:", error);
     }
@@ -52,10 +44,10 @@ export function LikeButton({
 
   return (
     <motion.button
-      className={`absolute top-2 left-2 p-2 rounded-full backdrop-blur-sm transition-colors ${
+      className={`absolute top-2 left-2 p-2 rounded-full backdrop-blur-md transition-colors z-10 ${
         isLiked
-          ? "bg-red-500 text-white"
-          : "bg-background/80 text-red-500 hover:bg-red-50 border border-red-500"
+          ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
+          : "bg-background/80 text-red-500 hover:bg-background border border-red-500/30"
       } ${className}`}
       onClick={handleClick}
       whileTap={{ scale: 0.8 }}

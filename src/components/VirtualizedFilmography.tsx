@@ -1,8 +1,9 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useDeferredValue } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Movie, genres, roles } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { LikeButton } from "./LikeButton";
+import { OptimizedImage } from "./OptimizedImage";
 import { Star, Filter, X, Grid, List, Search } from "lucide-react";
 
 interface VirtualizedFilmographyProps {
@@ -20,6 +21,8 @@ export function VirtualizedFilmography({
 }: VirtualizedFilmographyProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearch = useDeferredValue(searchQuery);
+
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
@@ -30,13 +33,11 @@ export function VirtualizedFilmography({
     return [...new Set(films.map((f) => f.year))].sort((a, b) => b - a);
   }, [films]);
 
-  // Filter films
+  // Filter films using deferred query for silky smooth typing
   const filteredFilms = useMemo(() => {
+    const query = deferredSearch.trim().toLowerCase();
     return films.filter((film) => {
-      if (
-        searchQuery &&
-        !film.title.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
+      if (query && !film.title.toLowerCase().includes(query)) {
         return false;
       }
       if (yearFilter !== "all" && film.year !== parseInt(yearFilter))
@@ -46,13 +47,13 @@ export function VirtualizedFilmography({
       if (roleFilter !== "all" && film.role !== roleFilter) return false;
       return true;
     });
-  }, [films, searchQuery, yearFilter, genreFilter, roleFilter]);
+  }, [films, deferredSearch, yearFilter, genreFilter, roleFilter]);
 
   const hasActiveFilters =
     yearFilter !== "all" ||
     genreFilter !== "all" ||
     roleFilter !== "all" ||
-    searchQuery;
+    searchQuery.trim().length > 0;
 
   const clearFilters = useCallback(() => {
     setYearFilter("all");
@@ -91,11 +92,14 @@ export function VirtualizedFilmography({
 
           <div className="flex items-center gap-2">
             {/* View toggle */}
-            <div className="flex border border-border rounded-md overflow-hidden">
+            <div className="flex border border-border rounded-md overflow-hidden bg-card/40">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 ${viewMode === "grid" ? "bg-secondary" : "hover:bg-secondary/50"
-                  }`}
+                className={`p-2 transition-colors ${
+                  viewMode === "grid"
+                    ? "bg-secondary text-gold"
+                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                }`}
                 aria-pressed={viewMode === "grid"}
                 aria-label="Grid view"
               >
@@ -103,8 +107,11 @@ export function VirtualizedFilmography({
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 ${viewMode === "list" ? "bg-secondary" : "hover:bg-secondary/50"
-                  }`}
+                className={`p-2 transition-colors ${
+                  viewMode === "list"
+                    ? "bg-secondary text-gold"
+                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                }`}
                 aria-pressed={viewMode === "list"}
                 aria-label="List view"
               >
@@ -128,13 +135,13 @@ export function VirtualizedFilmography({
 
         {/* Search */}
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <input
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search films..."
-            className="w-full pl-10 pr-4 py-2 bg-secondary border border-border rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-gold"
+            className="w-full pl-10 pr-4 py-2 bg-secondary border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold transition-all"
             aria-label="Search filmography"
           />
         </div>
@@ -147,6 +154,7 @@ export function VirtualizedFilmography({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
             <div className="card-cinematic p-6 mb-6">
@@ -162,7 +170,7 @@ export function VirtualizedFilmography({
                     id="year-filter"
                     value={yearFilter}
                     onChange={(e) => setYearFilter(e.target.value)}
-                    className="w-full bg-secondary border border-border rounded-md px-3 py-2 text-foreground"
+                    className="w-full bg-secondary border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-gold"
                   >
                     <option value="all">All Years</option>
                     {years.map((year) => (
@@ -184,7 +192,7 @@ export function VirtualizedFilmography({
                     id="genre-filter"
                     value={genreFilter}
                     onChange={(e) => setGenreFilter(e.target.value)}
-                    className="w-full bg-secondary border border-border rounded-md px-3 py-2 text-foreground"
+                    className="w-full bg-secondary border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-gold"
                   >
                     <option value="all">All Genres</option>
                     {genres.map((genre) => (
@@ -206,7 +214,7 @@ export function VirtualizedFilmography({
                     id="role-filter"
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value)}
-                    className="w-full bg-secondary border border-border rounded-md px-3 py-2 text-foreground"
+                    className="w-full bg-secondary border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-gold"
                   >
                     <option value="all">All Roles</option>
                     {roles.map((role) => (
@@ -225,7 +233,7 @@ export function VirtualizedFilmography({
                   onClick={clearFilters}
                   className="mt-4"
                 >
-                  <X className="h-4 w-4" /> Clear All Filters
+                  <X className="h-4 w-4 mr-1" /> Clear All Filters
                 </Button>
               )}
             </div>
@@ -244,28 +252,26 @@ export function VirtualizedFilmography({
         aria-label="Filmography"
       >
         {filteredFilms.map((film) => {
+          const posterSrc = film.posterLandscape || film.poster;
+
           if (viewMode === "grid") {
             return (
-              <motion.article
+              <article
                 key={film.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="group relative card-cinematic overflow-hidden cursor-pointer flex flex-col h-full"
+                className="group relative card-cinematic overflow-hidden cursor-pointer flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated hover:border-gold/30 will-change-transform [content-visibility:auto] [contain-intrinsic-size:380px]"
                 onClick={() => onMovieClick(film)}
                 onKeyDown={(e) => handleKeyDown(e, film)}
                 tabIndex={0}
                 role="listitem"
                 aria-label={`${film.title} (${film.year})`}
-                whileHover={{ y: -5 }}
               >
-                <div className="aspect-video overflow-hidden relative">
-                  <img
-                    src={film.posterLandscape || film.poster}
+                <div className="overflow-hidden relative">
+                  <OptimizedImage
+                    src={posterSrc}
                     alt={`${film.title} poster`}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    loading="lazy"
-                    decoding="async"
+                    fallbackTitle={film.title}
+                    aspectRatioClass="aspect-video"
+                    className="transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
 
@@ -297,40 +303,37 @@ export function VirtualizedFilmography({
                     <span className="text-sm text-foreground font-medium">
                       {film.rating.toFixed(1)}
                     </span>
-                    {film.runtime && (
+                    {film.runtime ? (
                       <>
                         <span className="text-xs text-muted-foreground">•</span>
                         <span className="text-sm text-muted-foreground">
                           {film.runtime}m
                         </span>
                       </>
-                    )}
+                    ) : null}
                   </div>
                 </div>
-              </motion.article>
+              </article>
             );
           }
 
           // List view
           return (
-            <motion.article
+            <article
               key={film.id}
-              layout
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="card-cinematic flex gap-6 p-4 cursor-pointer hover:border-gold/30 transition-all group relative"
+              className="card-cinematic flex flex-col sm:flex-row gap-6 p-4 cursor-pointer hover:border-gold/30 transition-all duration-300 group relative [content-visibility:auto] [contain-intrinsic-size:160px]"
               onClick={() => onMovieClick(film)}
               onKeyDown={(e) => handleKeyDown(e, film)}
               tabIndex={0}
               role="listitem"
             >
-              <div className="w-48 aspect-video rounded-md overflow-hidden flex-shrink-0 shadow-lg relative">
-                <img
-                  src={film.posterLandscape || film.poster}
+              <div className="w-full sm:w-48 aspect-video rounded-md overflow-hidden flex-shrink-0 shadow-lg relative">
+                <OptimizedImage
+                  src={posterSrc}
                   alt={`${film.title} poster`}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
-                  decoding="async"
+                  fallbackTitle={film.title}
+                  aspectRatioClass="aspect-video"
+                  className="transition-transform duration-500 group-hover:scale-105"
                 />
                 <LikeButton
                   movieId={film.id}
@@ -353,9 +356,11 @@ export function VirtualizedFilmography({
                       as {film.character}
                     </p>
                   )}
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2 max-w-2xl">
-                    {film.synopsis}
-                  </p>
+                  {film.synopsis && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2 max-w-2xl">
+                      {film.synopsis}
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-6 text-sm text-muted-foreground flex-wrap">
                   <span className="flex items-center gap-1.5 font-medium text-foreground">
@@ -363,17 +368,17 @@ export function VirtualizedFilmography({
                     {film.rating.toFixed(1)}
                   </span>
                   <span className="flex items-center gap-1">{film.role}</span>
-                  {film.runtime && (
+                  {film.runtime ? (
                     <span className="flex items-center gap-1">
                       {film.runtime}m
                     </span>
-                  )}
+                  ) : null}
                   <span className="flex items-center gap-1">
                     {film.genre.join(", ")}
                   </span>
                 </div>
               </div>
-            </motion.article>
+            </article>
           );
         })}
       </div>

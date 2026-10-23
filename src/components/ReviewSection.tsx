@@ -495,10 +495,13 @@ export function ReviewSection({
         setShowForm(false);
         clearDraft();
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         toast({
           title: "Failed to submit review",
-          description: error?.message || "Please try again later.",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Please try again later.",
           variant: "destructive",
         });
       },

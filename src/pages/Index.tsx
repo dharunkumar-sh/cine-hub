@@ -7,12 +7,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ErrorBoundary, FilmGridSkeleton } from "@/components/ErrorBoundary";
 import { VirtualizedFilmography } from "@/components/VirtualizedFilmography";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
-import { auth } from "@/lib/firebase";
-import {
-  onAuthStateChanged,
-  signOut,
-  User as FirebaseUser,
-} from "firebase/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Movie } from "@/data/mockData";
@@ -70,16 +65,9 @@ const PersonJsonLd = () => (
 function ActorProfile() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const { user, signOut } = useAuth();
   const { syncStatus, pendingCount } = useWatchlist();
   const { isOnline } = useServiceWorker();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
 
   const handleMovieClick = useCallback((movie: Movie) => {
     setSelectedMovie(movie);
@@ -149,7 +137,7 @@ function ActorProfile() {
                 <Button
                   variant="ghost"
                   size="iconSm"
-                  onClick={() => signOut(auth)}
+                  onClick={() => signOut()}
                   className="text-muted-foreground hover:text-gold"
                   title="Sign Out"
                 >

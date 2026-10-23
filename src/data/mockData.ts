@@ -86,8 +86,8 @@ export const mockActor: Actor = {
   birthDate: " 17 February 1985",
   birthPlace: "Singampunari, Sivaganga District",
   nationality: "Indian",
-  photo: "/hero.jpg",
-  backdropImage: "/background.jpg",
+  photo: "/hero.webp",
+  backdropImage: "/background.webp",
   shortBio:
     "Sivakarthikeyan, also known by his initials as SK, is an Indian actor, playback singer, lyricist, and film producer primarily active in Tamil cinema. He served as a television presenter before his entry into films.",
   bio: `Sivakarthikeyan was born on 17 February 1985 in Singampunari, Sivaganga district in a Tamil family. His father G. Doss was a jail superintendent. He has an elder sister, who is a doctor. He completed schooling at Campion Anglo-Indian Higher Secondary School in Tiruchirappalli and earned a Bachelor’s degree from JJ College of Engineering. He married Aarthi on 27 August 2010. The couple have three children, one daughter and two sons. His cousin is Arun Prabu, for which he collaborated with for Vaazhl (2021).`,
@@ -99,7 +99,8 @@ export const mockActor: Actor = {
       genre: ["Historical", "Drama", "Political fiction"],
       role: "Lead",
       character: "Lead Actor",
-      poster: "/sample.png",
+      poster:
+        "https://assets-in.bmscdn.com/discovery-catalog/events/et00487903-tkurapfmzb-landscape.jpg",
       posterLandscape:
         "https://assets-in.bmscdn.com/discovery-catalog/events/et00487903-tkurapfmzb-landscape.jpg",
       posterSquare:
@@ -117,7 +118,8 @@ export const mockActor: Actor = {
       genre: ["Historical", "Drama", "Political fiction"],
       role: "Lead",
       character: "Chezhiyan",
-      poster: "/sample.png",
+      poster:
+        "https://images.ottplay.com/images/parasakthi-poster-1738206213.jpg?impolicy=ottplay-202501_high&width=1200&height=675",
       posterLandscape:
         "https://images.ottplay.com/images/parasakthi-poster-1738206213.jpg?impolicy=ottplay-202501_high&width=1200&height=675",
       posterSquare:
@@ -135,10 +137,10 @@ export const mockActor: Actor = {
       genre: ["Action", "Thriller"],
       role: "Lead",
       character: "Raghu Ram",
-      poster: "/madharaasi.png",
+      poster: "/madharaasi.webp",
       posterLandscape:
         "https://www.acmodasi.in/amdb/images/movie/5/h/madharaasi-2025-B9Fhza.jpg",
-      posterSquare: "/madharaasi.png",
+      posterSquare: "/madharaasi.webp",
       rating: 6.7,
       runtime: 168,
       director: "	A. R. Murugadoss",
@@ -152,8 +154,8 @@ export const mockActor: Actor = {
       genre: ["Action", "Biography", "Adventure"],
       role: "Lead",
       character: "Major Mukund Varadarajan",
-      poster: "/amaran.png",
-      posterLandscape: "/amaran.png",
+      poster: "/amaran.webp",
+      posterLandscape: "/amaran.webp",
       posterSquare:
         "https://i.pinimg.com/736x/80/c5/b4/80c5b4fc125c958a6ce86f2e6c4b63ab.jpg",
       rating: 8.1,

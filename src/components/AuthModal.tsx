@@ -58,10 +58,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         });
       }
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Authentication Error",
-        description: error.message,
+        description:
+          error instanceof Error ? error.message : "Authentication failed",
         variant: "destructive",
       });
     } finally {

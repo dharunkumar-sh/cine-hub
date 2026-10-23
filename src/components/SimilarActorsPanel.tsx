@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Film, Award } from "lucide-react";
 
+import { OptimizedImage } from "./OptimizedImage";
+
 interface SimilarActorsPanelProps {
   actors: SimilarActor[];
 }
@@ -51,14 +53,14 @@ export function SimilarActorsPanel({ actors }: SimilarActorsPanelProps) {
             <div className="relative overflow-hidden rounded-lg mb-4">
               {/* Image container */}
               <div className="aspect-[2/3] overflow-hidden">
-                <motion.img
+                <OptimizedImage
                   src={actor.photo}
                   alt={actor.name}
-                  className="w-full h-full object-cover"
-                  animate={{
-                    scale: hoveredId === actor.id ? 1.1 : 1,
-                  }}
-                  transition={{ duration: 0.4 }}
+                  fallbackTitle={actor.name}
+                  aspectRatioClass="aspect-[2/3]"
+                  className={`transition-transform duration-500 ${
+                    hoveredId === actor.id ? "scale-105" : "scale-100"
+                  }`}
                 />
               </div>
 

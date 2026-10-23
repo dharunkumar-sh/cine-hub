@@ -13,8 +13,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { auth } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 const WatchlistContent = () => {
     const {
@@ -26,14 +25,7 @@ const WatchlistContent = () => {
         syncStatus,
     } = useWatchlist();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(!!auth.currentUser);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setIsLoggedIn(!!user);
-        });
-        return unsubscribe;
-    }, []);
+    const { isLoggedIn } = useAuth();
 
     const sortedItems = useMemo(
         () =>

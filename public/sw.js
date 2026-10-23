@@ -1,13 +1,19 @@
-// Service Worker for Cinematic Actor Platform
-const CACHE_NAME = "cinematic-v1";
-const STATIC_ASSETS = ["/", "/index.html"];
+// Optimized Service Worker for Cinematic Actor Platform
+const CACHE_NAME = "cinematic-v2";
+const IMAGE_CACHE = "cinematic-images-v2";
+const STATIC_ASSETS = [
+  "/",
+  "/index.html",
+  "/hero.webp",
+  "/background.webp",
+  "/placeholder.svg",
+  "/logo.svg",
+];
 
-// Install event - cache static assets
+// Install event - cache static core assets
 self.addEventListener("install", (event) => {
-  console.log("[SW] Installing service worker");
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("[SW] Caching static assets");
       return cache.addAll(STATIC_ASSETS);
     })
   );
@@ -16,23 +22,19 @@ self.addEventListener("install", (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener("activate", (event) => {
-  console.log("[SW] Activating service worker");
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => {
-            console.log("[SW] Deleting old cache:", name);
-            return caches.delete(name);
-          })
+          .filter((name) => name !== CACHE_NAME && name !== IMAGE_CACHE)
+          .map((name) => caches.delete(name))
       );
     })
   );
   self.clients.claim();
 });
 
-// Fetch event - network first, then cache
+// Fetch event with intelligent routing
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -40,11 +42,17 @@ self.addEventListener("fetch", (event) => {
   // Skip non-GET requests
   if (request.method !== "GET") return;
 
-  // Skip external requests
-  if (url.origin !== location.origin) return;
+  // Skip Firebase APIs and live database websockets
+  if (
+    url.hostname.includes("firestore.googleapis.com") ||
+    url.hostname.includes("identitytoolkit") ||
+    url.hostname.includes("securetoken") ||
+    url.hostname.includes("firebase")
+  ) {
+    return;
+  }
 
-  // Skip Vite dev server files (hot module replacement)
-  // Check search params for ?t= and pathname for @vite and /src/
+  // Skip Vite dev server files
   if (
     url.search.includes("t=") ||
     url.pathname.includes("@vite") ||
@@ -53,94 +61,104 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // For API requests - network first
-  if (url.pathname.startsWith("/api/")) {
+  // Handle Images (Local and External CDNs)
+  const isImageRequest =
+    request.destination === "image" ||
+    /\.(jpg|jpeg|png|webp|svg|gif)($|\?)/i.test(url.pathname) ||
+    url.hostname.includes("bmscdn.com") ||
+    url.hostname.includes("ottplay.com") ||
+    url.hostname.includes("media-amazon.com") ||
+    url.hostname.includes("moviecrow.com") ||
+    url.hostname.includes("pinimg.com");
+
+  if (isImageRequest) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Clone and cache successful responses
-          if (response.ok) {
-            const cloned = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, cloned);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // Fallback to cache on network error
-          return caches.match(request).then((cached) => {
-            if (cached) return cached;
-            // Return a network error response
-            return new Response("Network error", { status: 503 });
-          });
-        })
+      caches.open(IMAGE_CACHE).then((cache) => {
+        return cache.match(request).then((cachedResponse) => {
+          // If cached, return immediately and update in background
+          const fetchPromise = fetch(request)
+            .then((networkResponse) => {
+              if (networkResponse && networkResponse.ok) {
+                cache.put(request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+            .catch(() => cachedResponse);
+
+          return cachedResponse || fetchPromise;
+        });
+      })
     );
     return;
   }
 
-  // For static assets - stale while revalidate
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      const fetchPromise = fetch(request)
-        .then((response) => {
-          // Update cache with fresh response
-          if (response.ok) {
-            const cloned = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, cloned);
-            });
-          }
-          return response;
-        })
-        .catch((error) => {
-          // Return cached if fetch fails
-          if (cached) return cached;
-          // Return a proper error response
-          console.error("[SW] Fetch failed for:", request.url, error);
-          return new Response("Service unavailable", { status: 503 });
-        });
+  // Handle Google Fonts
+  if (
+    url.hostname === "fonts.googleapis.com" ||
+    url.hostname === "fonts.gstatic.com"
+  ) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(request).then((cachedResponse) => {
+          const fetchPromise = fetch(request)
+            .then((networkResponse) => {
+              if (networkResponse && networkResponse.ok) {
+                cache.put(request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+            .catch(() => cachedResponse);
 
-      // Return cached immediately, update in background
-      return cached || fetchPromise;
-    })
-  );
+          return cachedResponse || fetchPromise;
+        });
+      })
+    );
+    return;
+  }
+
+  // Same-origin static assets - Stale while revalidate
+  if (url.origin === location.origin) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(request).then((cachedResponse) => {
+          const fetchPromise = fetch(request)
+            .then((networkResponse) => {
+              if (networkResponse && networkResponse.ok) {
+                cache.put(request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+            .catch(() => cachedResponse);
+
+          return cachedResponse || fetchPromise;
+        });
+      })
+    );
+    return;
+  }
 });
 
 // Background sync for watchlist
 self.addEventListener("sync", (event) => {
-  console.log("[SW] Background sync triggered:", event.tag);
-
   if (event.tag === "watchlist-sync") {
     event.waitUntil(syncWatchlist());
   }
 });
 
 async function syncWatchlist() {
-  console.log("[SW] Syncing watchlist...");
-
   try {
-    // Open IndexedDB and get pending items
     const db = await openDB();
     const pending = await getPendingItems(db);
 
-    if (pending.length === 0) {
-      console.log("[SW] No pending items to sync");
-      return;
-    }
+    if (pending.length === 0) return;
 
-    console.log("[SW] Syncing", pending.length, "items");
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Simulate sync (in production, this would call your API)
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Mark items as synced
     await markSynced(
       db,
       pending.map((p) => p.id)
     );
 
-    // Notify clients
     const clients = await self.clients.matchAll();
     clients.forEach((client) => {
       client.postMessage({
@@ -148,11 +166,9 @@ async function syncWatchlist() {
         count: pending.length,
       });
     });
-
-    console.log("[SW] Sync complete");
   } catch (error) {
     console.error("[SW] Sync failed:", error);
-    throw error; // Retry sync
+    throw error;
   }
 }
 
@@ -210,8 +226,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "/favicon.ico",
-      badge: "/favicon.ico",
+      icon: "/logo.svg",
+      badge: "/logo.svg",
       data: data.url,
     })
   );
